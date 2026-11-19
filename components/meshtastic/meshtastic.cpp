@@ -165,7 +165,9 @@ void Meshtastic::setup() {
     this->node_num_ = ((uint32_t) mac[2] << 24) | ((uint32_t) mac[3] << 16) | ((uint32_t) mac[4] << 8) | mac[5];
   }
   if (this->short_name_.empty())
-    this->short_name_ = str_snprintf("%04x", 4, this->node_num_ & 0xFFFF);
+    char short_buf[5];
+    snprintf(short_buf, sizeof(short_buf), "%04x", static_cast<unsigned int>(this->node_num_ & 0xFFFF));
+    this->short_name_ = short_buf;
   if (this->long_name_.empty())
     this->long_name_ = "Meshtastic " + this->short_name_;
 
@@ -193,7 +195,9 @@ void Meshtastic::setup() {
 
 #ifdef USE_TEXT_SENSOR
   if (this->node_id_text_sensor_ != nullptr)
-    this->node_id_text_sensor_->publish_state(str_snprintf("!%08x", 9, this->node_num_));
+    char node_id_buf[10];
+    snprintf(node_id_buf, sizeof(node_id_buf), "!%08x", static_cast<unsigned int>(this->node_num_));
+    this->node_id_text_sensor_->publish_state(node_id_buf);
 #endif
 #ifdef USE_SENSOR
   this->set_interval(30000, [this]() { this->publish_stats_(); });
